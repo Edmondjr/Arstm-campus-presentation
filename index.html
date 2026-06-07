@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARSTM Campus — Présentation</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --navy:#0F2744; --blue:#2563EB; --aqua:#0891B2;
+    --gold:#D97706; --green:#059669; --purple:#7C3AED;
+    --red:#DC2626; --white:#FFFFFF; --light:#F0F4F8;
+    --mid:#64748B; --dark:#1E293B;
+  }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0a0a0a; color:var(--dark); overflow:hidden; }
+  
+  /* Navigation */
+  #nav { position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    display:flex; gap:10px; z-index:100; background:rgba(0,0,0,0.6);
+    padding:10px 20px; border-radius:30px; backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.1); }
+  #nav button { background:rgba(255,255,255,0.1); border:none; color:#fff;
+    width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1rem;
+    transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+  #nav button:hover { background:var(--blue); transform:scale(1.1); }
+  #nav button.active { background:var(--blue); }
+  #nav #counter { color:rgba(255,255,255,0.6); font-size:0.8rem;
+    display:flex; align-items:center; padding:0 8px; min-width:50px; justify-content:center; }
+  #progress { position:fixed; top:0; left:0; height:3px; background:var(--blue);
+    transition:width 0.4s; z-index:200; }
+
+  /* Slides container */
+  #slides { width:100vw; height:100vh; position:relative; }
+  .slide { position:absolute; inset:0; display:flex; align-items:center;
+    justify-content:center; opacity:0; transition:opacity 0.5s, transform 0.5s;
+    transform:translateY(20px); pointer-events:none; }
+  .slide.active { opacity:1; transform:translateY(0); pointer-events:all; }
+  .slide-inner { width:90%; max-width:900px; }
+
+  /* Slide 1 — Titre */
+  .s1 { background:linear-gradient(135deg, var(--navy) 0%, #1a3a6e 100%); }
+  .s1 .logo-box { width:70px; height:70px; border-radius:16px;
+    background:var(--blue); display:flex; align-items:center; justify-content:center;
+    font-size:2rem; font-weight:900; color:#fff; margin-bottom:8px; }
+  .s1 .app-name { font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:4px; }
+  .s1 .app-name span { color:#67E8F9; }
+  .s1 .tagline { font-size:0.85rem; color:#94A3B8; font-style:italic; margin-bottom:32px; }
+  .s1 h1 { font-size:clamp(1.8rem,5vw,2.8rem); font-weight:900; color:#fff;
+    line-height:1.2; margin-bottom:12px; }
+  .s1 .subtitle { font-size:1rem; color:#94A3B8; margin-bottom:32px; }
+  .roles { display:flex; gap:10px; flex-wrap:wrap; }
+  .role-badge { padding:6px 16px; border-radius:20px; font-size:0.85rem;
+    font-weight:600; color:#fff; backdrop-filter:blur(8px); }
+
+  /* Slide 2 — Contexte */
+  .s2 { background:var(--light); }
+  .slide-title { font-size:clamp(1.4rem,4vw,2rem); font-weight:800; color:var(--dark); margin-bottom:4px; }
+  .slide-subtitle { font-size:0.95rem; color:var(--mid); font-style:italic; margin-bottom:28px; }
+  .problems-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .problem-card { background:#fff; border-radius:14px; padding:20px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.07); display:flex; gap:14px; align-items:flex-start; }
+  .problem-icon { font-size:1.8rem; flex-shrink:0; }
+  .problem-fr { font-size:0.95rem; font-weight:700; color:var(--dark); margin-bottom:3px; }
+  .problem-en { font-size:0.82rem; color:var(--mid); font-style:italic; }
+
+  /* Slide 3 — Solution */
+  .s3 { background:linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%); }
+  .solution-box { background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.3);
+    border-radius:14px; padding:18px 24px; margin-bottom:24px; text-align:center;
+    font-size:1rem; color:#fff; line-height:1.7; }
+  .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .feature-card { border-radius:14px; padding:16px; text-align:center;
+    border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(8px); }
+  .feature-icon { font-size:1.8rem; margin-bottom:8px; }
+  .feature-name { font-size:0.88rem; font-weight:700; color:#fff; margin-bottom:4px; }
+  .feature-en { font-size:0.75rem; color:#94A3B8; font-style:italic; }
+
+  /* Slide 4 — Rôles */
+  .s4 { background:var(--white); }
+  .profiles-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .profile-card { border-radius:14px; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.07); }
+  .profile-header { padding:10px 16px; font-weight:700; color:#fff; font-size:0.95rem; }
+  .profile-body { padding:14px 16px; }
+  .profile-body li { font-size:0.85rem; color:var(--dark); margin-bottom:5px;
+    list-style:none; display:flex; align-items:center; gap:6px; }
+  .profile-body li::before { content:"›"; color:var(--mid); font-weight:700; }
+
+  /* Slide 5 — Tech */
+  .s5 { background:linear-gradient(135deg, var(--navy) 0%, #0f3460 100%); }
+  .tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .tech-card { background:rgba(255,255,255,0.06); border-radius:14px; padding:20px;
+    text-align:center; border:1px solid rgba(255,255,255,0.1); transition:transform 0.2s; }
+  .tech-card:hover { transform:translateY(-4px); }
+  .tech-icon { font-size:2rem; margin-bottom:10px; }
+  .tech-name { font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:4px; }
+  .tech-desc { font-size:0.8rem; color:#94A3B8; line-height:1.5; }
+
+  /* Slide 6 — Screens */
+  .s6 { background:var(--light); }
+  .screens-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .screen-card { border-radius:14px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1);
+    cursor:pointer; transition:transform 0.2s; }
+  .screen-card:hover { transform:translateY(-4px); }
+  .screen-header { padding:10px; text-align:center; font-weight:700; color:#fff; font-size:0.9rem; }
+  .screen-body { background:#fff; padding:20px; text-align:center; font-size:2.2rem; }
+  .screen-label { font-size:0.8rem; color:var(--mid); font-style:italic; padding:8px; background:#fff; text-align:center; }
+
+  /* Slide 7 — CTA */
+  .s7 { background:linear-gradient(135deg, var(--navy) 0%, #1a2a4a 100%); }
+  .cta-link { background:var(--blue); border-radius:14px; padding:16px 32px;
+    text-align:center; margin:20px 0; font-size:1.2rem; font-weight:800; color:#fff;
+    letter-spacing:0.02em; box-shadow:0 8px 24px rgba(37,99,235,0.35);
+    cursor:pointer; transition:transform 0.2s; text-decoration:none; display:block; }
+  .cta-link:hover { transform:scale(1.02); }
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:20px; }
+  .step { text-align:center; }
+  .step-num { width:36px; height:36px; border-radius:50%; background:var(--aqua);
+    display:flex; align-items:center; justify-content:center; font-weight:800;
+    color:#fff; font-size:1rem; margin:0 auto 8px; }
+  .step-label { font-size:0.82rem; color:#CBD5E1; line-height:1.5; }
+
+  /* Slide 8 — Merci */
+  .s8 { background:linear-gradient(135deg, var(--navy) 0%, #0f2034 100%); }
+  .thanks-logo { width:90px; height:90px; border-radius:20px; background:var(--blue);
+    display:flex; align-items:center; justify-content:center;
+    font-size:3rem; font-weight:900; color:#fff; margin:0 auto 20px; }
+  .thanks-title { font-size:2.5rem; font-weight:900; color:#fff; text-align:center; margin-bottom:8px; }
+  .thanks-sub { font-size:1.3rem; color:#67E8F9; text-align:center; font-style:italic; margin-bottom:20px; }
+  .thanks-msg { font-size:1rem; color:#94A3B8; text-align:center; margin-bottom:24px; }
+  .thanks-link { background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.4);
+    border-radius:12px; padding:12px 28px; color:#fff; font-size:1rem;
+    text-align:center; margin:0 auto; max-width:400px; cursor:pointer; }
+
+  /* Sidebar de navigation slides */
+  #sidebar { position:fixed; left:16px; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:6px; z-index:100; }
+  .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2);
+    cursor:pointer; transition:all 0.2s; }
+  .dot.active { background:#fff; width:10px; height:10px; }
+
+  /* Responsive */
+  @media (max-width:600px) {
+    .problems-grid, .profiles-grid, .screens-grid, .tech-grid { grid-template-columns:1fr; }
+    .features-grid { grid-template-columns:1fr 1fr; }
+    .steps { grid-template-columns:1fr 1fr; }
+    .roles { justify-content:center; }
+  }
+
+  .accent-bar { width:50px; height:4px; border-radius:2px; background:var(--blue); margin-bottom:16px; }
+  .footer { position:fixed; bottom:8px; right:16px; font-size:0.7rem; color:rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- Sidebar dots -->
+<div id="sidebar">
+  <div class="dot active" onclick="goTo(0)"></div>
+  <div class="dot" onclick="goTo(1)"></div>
+  <div class="dot" onclick="goTo(2)"></div>
+  <div class="dot" onclick="goTo(3)"></div>
+  <div class="dot" onclick="goTo(4)"></div>
+  <div class="dot" onclick="goTo(5)"></div>
+  <div class="dot" onclick="goTo(6)"></div>
+  <div class="dot" onclick="goTo(7)"></div>
+</div>
+
+<div id="slides">
+
+  <!-- SLIDE 1 — TITRE -->
+  <div class="slide s1 active">
+    <div class="slide-inner">
+      <div class="logo-box">A</div>
+      <div class="app-name">ARSTM<span>Campus</span></div>
+      <div class="tagline">Votre campus. Votre réseau. Votre avenir numérique.</div>
+      <h1>Une plateforme numérique<br>pour la communauté ARSTM</h1>
+      <div class="subtitle" style="margin-top:8px;font-style:italic;color:#94A3B8">A digital platform for the ARSTM community</div>
+      <div class="subtitle">Application web — Étudiants · Enseignants · Alumni · Administration</div>
+      <div class="roles">
+        <div class="role-badge" style="background:rgba(37,99,235,0.3)">🎓 Étudiants</div>
+        <div class="role-badge" style="background:rgba(5,150,105,0.3)">📖 Enseignants</div>
+        <div class="role-badge" style="background:rgba(217,119,6,0.3)">🏅 Alumni</div>
+        <div class="role-badge" style="background:rgba(124,58,237,0.3)">🏫 Administration</div>
+        <div class="role-badge" style="background:rgba(8,145,178,0.3)">⚙️ Admin Plateforme</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — CONTEXTE -->
+  <div class="slide s2">
+    <div class="slide-inner">
+      <div class="accent-bar" style="background:var(--blue)"></div>
+      <div class="slide-title">Pourquoi ARSTM Campus ?</div>
+      <div class="slide-subtitle">Why ARSTM Campus?</div>
+      <div class="problems-grid">
+        <div class="problem-card">
+          <div class="problem-icon">📋</div>
+          <div><div class="problem-fr">Communication fragmentée</div><div class="problem-en">Scattered announcements, missing info</div></div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🔗</div>
+          <div><div class="problem-fr">Réseau alumni inexploité</div><div class="problem-en">Weak alumni-student connection</div></div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📁</div>
+          <div><div class="problem-fr">Ressources non centralisées</div><div class="problem-en">Scattered course materials</div></div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📅</div>
+          <div><div class="problem-fr">EDT difficile d'accès</div><div class="problem-en">Timetables not available in real time</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — SOLUTION -->
+  <div class="slide s3">
+    <div class="slide-inner">
+      <div class="slide-title" style="color:#fff">La Solution</div>
+      <div class="slide-subtitle" style="color:#94A3B8">The Solution</div>
+      <div class="solution-box">
+        <strong>ARSTM Campus</strong> — Une application web complète, accessible sur tous les appareils,<br>
+        connectant toute la communauté de l'ARSTM · A complete web app connecting the entire ARSTM community
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" style="background:rgba(37,99,235,0.15)">
+          <div class="feature-icon">💬</div>
+          <div class="feature-name">Forum & Messagerie</div>
+          <div class="feature-en">Forum & Messaging</div>
+        </div>
+        <div class="feature-card" style="background:rgba(5,150,105,0.15)">
+          <div class="feature-icon">📚</div>
+          <div class="feature-name">Ressources & EDT</div>
+          <div class="feature-en">Resources & Timetable</div>
+        </div>
+        <div class="feature-card" style="background:rgba(217,119,6,0.15)">
+          <div class="feature-icon">🏅</div>
+          <div class="feature-name">Espace Alumni</div>
+          <div class="feature-en">Alumni Network</div>
+        </div>
+        <div class="feature-card" style="background:rgba(124,58,237,0.15)">
+          <div class="feature-icon">⚙️</div>
+          <div class="feature-name">Admin & Contrôle</div>
+          <div class="feature-en">Admin & Control Panel</div>
+        </div>
+        <div class="feature-card" style="background:rgba(8,145,178,0.15)">
+          <div class="feature-icon">🔔</div>
+          <div class="feature-name">Notifications temps réel</div>
+          <div class="feature-en">Real-time Notifications</div>
+        </div>
+        <div class="feature-card" style="background:rgba(220,38,38,0.15)">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-name">Sécurisé · Firebase</div>
+          <div class="feature-en">Secured · Firebase Auth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — RÔLES -->
+  <div class="slide s4">
+    <div class="slide-inner">
+      <div class="accent-bar" style="background:var(--green)"></div>
+      <div class="slide-title">Fonctionnalités par profil</div>
+      <div class="slide-subtitle">Features by user profile</div>
+      <div class="profiles-grid">
+        <div class="profile-card">
+          <div class="profile-header" style="background:var(--blue)">🎓 Étudiant / Student</div>
+          <div class="profile-body"><ul>
+            <li>Forum & posts sociaux</li>
+            <li>Emploi du temps temps réel</li>
+            <li>Ressources & cours</li>
+            <li>Messagerie privée & groupes</li>
+            <li>Offres d'emploi Alumni</li>
+          </ul></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-header" style="background:var(--green)">📖 Enseignant / Teacher</div>
+          <div class="profile-body"><ul>
+            <li>Dépôt de cours & ressources</li>
+            <li>Annonces ciblées par promo</li>
+            <li>Messagerie avec étudiants</li>
+            <li>Profil multi-écoles ARSTM</li>
+            <li>Forum de la communauté</li>
+          </ul></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-header" style="background:var(--gold)">🏅 Alumni</div>
+          <div class="profile-body"><ul>
+            <li>Publication d'offres emploi</li>
+            <li>Conseils aux étudiants</li>
+            <li>Réseau des anciens</li>
+            <li>Messagerie privée</li>
+            <li>Profil professionnel</li>
+          </ul></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-header" style="background:var(--purple)">🏫 Administration</div>
+          <div class="profile-body"><ul>
+            <li>Gestion des annonces</li>
+            <li>Emploi du temps</li>
+            <li>Ressources pédagogiques</li>
+            <li>Suivi des demandes</li>
+            <li>Communication interne</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — TECH -->
+  <div class="slide s5">
+    <div class="slide-inner">
+      <div class="slide-title" style="color:#fff">Architecture technique</div>
+      <div class="slide-subtitle" style="color:#94A3B8">Technical Stack</div>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-icon">⚛️</div>
+          <div class="tech-name">React + Vite</div>
+          <div class="tech-desc">Interface utilisateur rapide<br>Fast user interface</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">🔐</div>
+          <div class="tech-name">Firebase Auth</div>
+          <div class="tech-desc">Authentification 5 rôles<br>5-role authentication</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">🗄️</div>
+          <div class="tech-name">Firestore</div>
+          <div class="tech-desc">Base de données temps réel<br>Real-time database</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">📦</div>
+          <div class="tech-name">Firebase Storage</div>
+          <div class="tech-desc">Fichiers & médias<br>Files & media</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">🚀</div>
+          <div class="tech-name">Vercel</div>
+          <div class="tech-desc">Déploiement automatique<br>Auto deployment CI/CD</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">🎨</div>
+          <div class="tech-name">Tailwind CSS</div>
+          <div class="tech-desc">Design responsive mobile<br>Mobile-first design</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px;font-size:0.85rem;color:#64748B">
+        Déployé sur · Deployed at: <strong style="color:#67E8F9">arstm-campus.vercel.app</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — SCREENS -->
+  <div class="slide s6">
+    <div class="slide-inner">
+      <div class="accent-bar" style="background:var(--gold)"></div>
+      <div class="slide-title">L'application en images</div>
+      <div class="slide-subtitle">App Screenshots Preview</div>
+      <div class="screens-grid">
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--navy)">🔐 Connexion / Login</div>
+          <div class="screen-body">🔐</div>
+          <div class="screen-label">Inscription par rôle · Role-based signup</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--blue)">🏠 Accueil / Home</div>
+          <div class="screen-body">🏠</div>
+          <div class="screen-label">Dashboard dynamique · Dynamic dashboard</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--green)">💬 Forum Social</div>
+          <div class="screen-body">💬</div>
+          <div class="screen-label">Posts, réactions, commentaires</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--aqua)">✉️ Messagerie</div>
+          <div class="screen-body">✉️</div>
+          <div class="screen-label">Chat privé style WhatsApp</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--gold)">🏅 Alumni</div>
+          <div class="screen-body">🏅</div>
+          <div class="screen-label">Offres emploi · Job offers</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-header" style="background:var(--purple)">⚙️ Admin Panel</div>
+          <div class="screen-body">⚙️</div>
+          <div class="screen-label">Centre de contrôle · Control center</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — CTA -->
+  <div class="slide s7">
+    <div class="slide-inner" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:12px">🚀</div>
+      <div class="slide-title" style="color:#fff;text-align:center">Phase de test officielle</div>
+      <div class="slide-subtitle" style="color:#94A3B8;text-align:center;margin-bottom:16px">Official Testing Phase</div>
+      <div style="font-size:0.95rem;color:#94A3B8;margin-bottom:20px;line-height:1.7">
+        Vous êtes nos premiers utilisateurs — votre feedback façonne l'avenir d'ARSTM Campus !<br>
+        <em>You are our first users — your feedback shapes the future of ARSTM Campus!</em>
+      </div>
+      <a href="https://arstm-campus.vercel.app" target="_blank" class="cta-link">
+        🌐 arstm-campus.vercel.app
+      </a>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-label">Créer votre compte<br><em>Create account</em></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-label">Choisir votre profil<br><em>Choose profile</em></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-label">Explorer & tester<br><em>Explore & test</em></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-label">Partager votre avis<br><em>Share feedback</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8 — MERCI -->
+  <div class="slide s8">
+    <div class="slide-inner" style="text-align:center">
+      <div class="thanks-logo">A</div>
+      <div class="thanks-title">ARSTM Campus</div>
+      <div class="thanks-sub">Merci · Thank You</div>
+      <div class="thanks-msg">
+        Questions & retours bienvenus<br>
+        <em>Feedback & Questions Welcome</em>
+      </div>
+      <div class="thanks-link">
+        🌐 arstm-campus.vercel.app &nbsp;|&nbsp; NexaBridge Solutions
+      </div>
+      <div style="margin-top:20px;font-size:0.8rem;color:#475569">
+        Développé par · Developed by <strong style="color:#67E8F9">MrDNEJ</strong> · NexaBridge Solutions · Juin 2026
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div id="nav">
+  <button onclick="prev()">←</button>
+  <div id="counter">1 / 8</div>
+  <button onclick="next()">→</button>
+  <button onclick="toggleFullscreen()" title="Plein écran">⛶</button>
+</div>
+
+<div class="footer">ARSTM Campus · NexaBridge Solutions · 2026</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll(".slide");
+  const dots   = document.querySelectorAll(".dot");
+  const total  = slides.length;
+
+  function goTo(n) {
+    slides[current].classList.remove("active");
+    dots[current].classList.remove("active");
+    current = Math.max(0, Math.min(n, total-1));
+    slides[current].classList.add("active");
+    dots[current].classList.add("active");
+    document.getElementById("counter").textContent = `${current+1} / ${total}`;
+    document.getElementById("progress").style.width = `${((current+1)/total)*100}%`;
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") { e.preventDefault(); next(); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowUp")   { e.preventDefault(); prev(); }
+    if (e.key === "f" || e.key === "F") toggleFullscreen();
+    if (e.key === "Escape" && document.fullscreenElement) document.exitFullscreen();
+  });
+
+  // Touch swipe
+  let startX = 0;
+  document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+  document.addEventListener("touchend",   e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+  });
+
+  goTo(0);
+</script>
+</body>
+</html>
