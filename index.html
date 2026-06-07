@@ -29,13 +29,13 @@
   .slide {
     position:absolute; inset:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    opacity:0; transition:opacity 0.45s, transform 0.45s;
-    transform:translateX(40px); pointer-events:none;
+    opacity:0; transition:opacity 0.35s ease;
+    pointer-events:none;
     padding-bottom:var(--nav-h);
     overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
-  .slide.active  { opacity:1; transform:translateX(0);  pointer-events:all; }
-  .slide.prev    { transform:translateX(-40px); }
+  .slide.active  { opacity:1; pointer-events:all; }
+  .slide.prev    { opacity:0; }
   .slide-inner   { width:92%; max-width:860px; padding:24px 0; }
 
   /* ── Sidebar dots (desktop only) ── */
@@ -174,7 +174,9 @@
     text-align:center; margin-bottom:20px; }
   .thanks-link { background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.4);
     border-radius:12px; padding:12px 24px; color:#fff; font-size:0.95rem;
-    text-align:center; margin:0 auto; max-width:380px; }
+    text-align:center; margin:0 auto; max-width:380px; cursor:pointer;
+    transition:background 0.2s; }
+  .thanks-link:hover { background:rgba(37,99,235,0.35); }
 
   .accent-bar { width:44px; height:4px; border-radius:2px;
     background:var(--blue); margin-bottom:14px; }
@@ -185,7 +187,6 @@
   @media (max-width:640px) {
     :root { --nav-h: 64px; }
 
-    /* Slides scroll on mobile */
     .slide {
       justify-content:flex-start;
       padding-top:16px;
@@ -193,15 +194,12 @@
     }
     .slide-inner { padding:0 0 16px; }
 
-    /* Hide sidebar dots, show mobile dots */
     #sidebar { display:none; }
     #mob-dots { display:flex; }
     #counter  { display:none; }
 
-    /* Nav buttons bigger */
     .nav-btn { width:48px; height:48px; font-size:1.2rem; }
 
-    /* ─ Slide 1 ─ */
     .logo-box { width:52px; height:52px; font-size:1.5rem; margin-bottom:6px; }
     .app-name { font-size:1.2rem; }
     .tagline  { font-size:0.78rem; margin-bottom:14px; }
@@ -209,49 +207,41 @@
     .s1 .subtitle { font-size:0.82rem; margin-bottom:14px; }
     .role-badge { font-size:0.75rem; padding:4px 11px; }
 
-    /* ─ Slide 2 ─ */
     .problems-grid { grid-template-columns:1fr; gap:10px; }
     .problem-card  { padding:13px; }
     .problem-icon  { font-size:1.4rem; }
     .problem-fr    { font-size:0.88rem; }
 
-    /* ─ Slide 3 ─ */
     .solution-box   { font-size:0.82rem; padding:12px 14px; }
     .features-grid  { grid-template-columns:1fr 1fr; gap:9px; }
     .feature-icon   { font-size:1.4rem; }
     .feature-name   { font-size:0.78rem; }
     .feature-en     { display:none; }
 
-    /* ─ Slide 4 ─ */
     .profiles-grid { grid-template-columns:1fr; gap:10px; }
     .profile-body li { font-size:0.78rem; }
 
-    /* ─ Slide 5 ─ */
     .tech-grid { grid-template-columns:1fr 1fr; gap:10px; }
     .tech-card { padding:12px 8px; }
     .tech-icon { font-size:1.5rem; }
     .tech-name { font-size:0.82rem; }
     .tech-desc { font-size:0.7rem; }
 
-    /* ─ Slide 6 ─ */
     .screens-grid { grid-template-columns:1fr 1fr; gap:10px; }
     .screen-body  { padding:14px; font-size:1.7rem; }
     .screen-label { font-size:0.68rem; }
 
-    /* ─ Slide 7 ─ */
     .cta-link   { font-size:0.95rem; padding:14px 18px; }
     .steps      { grid-template-columns:1fr 1fr; gap:10px; }
     .step-label { font-size:0.73rem; }
     .step-num   { width:30px; height:30px; font-size:0.85rem; }
 
-    /* ─ Slide 8 ─ */
     .thanks-logo  { width:66px; height:66px; font-size:2rem; }
     .thanks-title { font-size:1.75rem; }
     .thanks-sub   { font-size:1rem; }
     .thanks-msg   { font-size:0.85rem; }
     .thanks-link  { font-size:0.85rem; padding:10px 16px; }
 
-    /* General */
     .slide-title    { font-size:1.3rem; }
     .slide-subtitle { font-size:0.82rem; margin-bottom:14px; }
     .accent-bar     { margin-bottom:10px; }
@@ -262,7 +252,6 @@
 
 <div id="progress"></div>
 
-<!-- Sidebar dots (desktop) -->
 <div id="sidebar">
   <div class="dot active" onclick="goTo(0)"></div>
   <div class="dot" onclick="goTo(1)"></div>
@@ -514,22 +503,10 @@
         🌐 arstm-campus.vercel.app
       </a>
       <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-label">Créer votre compte</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-label">Choisir votre profil</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-label">Explorer & tester</div>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-label">Partager votre avis</div>
-        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-label">Créer votre compte</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-label">Choisir votre profil</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-label">Explorer & tester</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-label">Partager votre avis</div></div>
       </div>
     </div>
   </div>
@@ -544,9 +521,9 @@
         Questions & retours bienvenus<br>
         <em>Feedback & Questions Welcome</em>
       </div>
-      <div class="thanks-link">
-        🌐 arstm-campus.vercel.app &nbsp;| NexaBridge Solutions
-      </div>
+      <a href="https://arstm-campus.vercel.app" target="_blank" class="thanks-link" style="text-decoration:none;display:block;">
+        🌐 arstm-campus.vercel.app  |  NexaBridge Solutions
+      </a>
       <div style="margin-top:16px;font-size:0.78rem;color:#475569">
         Développé par <strong style="color:#67E8F9">MrDNEJ</strong> · NexaBridge Solutions · Juin 2026
       </div>
@@ -555,7 +532,6 @@
 
 </div>
 
-<!-- Navigation bar -->
 <div id="nav">
   <button class="nav-btn" onclick="prev()" aria-label="Précédent">←</button>
   <div id="mob-dots">
@@ -586,20 +562,15 @@
     slides[prev].classList.add("prev");
     dots[prev].classList.remove("active");
     mdots[prev].classList.remove("active");
-
     current = Math.max(0, Math.min(n, total - 1));
-
     slides[current].classList.remove("prev");
     slides[current].classList.add("active");
     slides[current].scrollTop = 0;
-
     dots[current].classList.add("active");
     mdots[current].classList.add("active");
-
     document.getElementById("counter").textContent = `${current + 1} / ${total}`;
     document.getElementById("progress").style.width = `${((current + 1) / total) * 100}%`;
-
-    setTimeout(() => slides[prev].classList.remove("prev"), 500);
+    setTimeout(() => slides[prev].classList.remove("prev"), 400);
   }
 
   function next() { if (current < total - 1) goTo(current + 1); }
@@ -625,7 +596,6 @@
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
-
   document.addEventListener("touchend", e => {
     const dx = touchStartX - e.changedTouches[0].clientX;
     const dy = touchStartY - e.changedTouches[0].clientY;
