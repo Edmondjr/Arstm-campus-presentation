@@ -2,159 +2,267 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ARSTM Campus — Présentation</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   :root {
     --navy:#0F2744; --blue:#2563EB; --aqua:#0891B2;
     --gold:#D97706; --green:#059669; --purple:#7C3AED;
     --red:#DC2626; --white:#FFFFFF; --light:#F0F4F8;
     --mid:#64748B; --dark:#1E293B;
+    --nav-h: 72px;
   }
-  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0a0a0a; color:var(--dark); overflow:hidden; }
-  
-  /* Navigation */
-  #nav { position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-    display:flex; gap:10px; z-index:100; background:rgba(0,0,0,0.6);
-    padding:10px 20px; border-radius:30px; backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,0.1); }
-  #nav button { background:rgba(255,255,255,0.1); border:none; color:#fff;
-    width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1rem;
-    transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
-  #nav button:hover { background:var(--blue); transform:scale(1.1); }
-  #nav button.active { background:var(--blue); }
-  #nav #counter { color:rgba(255,255,255,0.6); font-size:0.8rem;
-    display:flex; align-items:center; padding:0 8px; min-width:50px; justify-content:center; }
+  html, body { height:100%; }
+  body {
+    font-family:'Segoe UI',system-ui,sans-serif;
+    background:#0a0a0a; color:var(--dark);
+    overflow:hidden; touch-action:pan-y;
+  }
+
+  /* ── Progress bar ── */
   #progress { position:fixed; top:0; left:0; height:3px; background:var(--blue);
-    transition:width 0.4s; z-index:200; }
+    transition:width 0.4s; z-index:300; }
 
-  /* Slides container */
-  #slides { width:100vw; height:100vh; position:relative; }
-  .slide { position:absolute; inset:0; display:flex; align-items:center;
-    justify-content:center; opacity:0; transition:opacity 0.5s, transform 0.5s;
-    transform:translateY(20px); pointer-events:none; }
-  .slide.active { opacity:1; transform:translateY(0); pointer-events:all; }
-  .slide-inner { width:90%; max-width:900px; }
+  /* ── Slides container ── */
+  #slides { width:100vw; height:100dvh; position:relative; }
+  .slide {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; transition:opacity 0.45s, transform 0.45s;
+    transform:translateX(40px); pointer-events:none;
+    padding-bottom:var(--nav-h);
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .slide.active  { opacity:1; transform:translateX(0);  pointer-events:all; }
+  .slide.prev    { transform:translateX(-40px); }
+  .slide-inner   { width:92%; max-width:860px; padding:24px 0; }
 
-  /* Slide 1 — Titre */
-  .s1 { background:linear-gradient(135deg, var(--navy) 0%, #1a3a6e 100%); }
-  .s1 .logo-box { width:70px; height:70px; border-radius:16px;
-    background:var(--blue); display:flex; align-items:center; justify-content:center;
-    font-size:2rem; font-weight:900; color:#fff; margin-bottom:8px; }
-  .s1 .app-name { font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:4px; }
-  .s1 .app-name span { color:#67E8F9; }
-  .s1 .tagline { font-size:0.85rem; color:#94A3B8; font-style:italic; margin-bottom:32px; }
-  .s1 h1 { font-size:clamp(1.8rem,5vw,2.8rem); font-weight:900; color:#fff;
-    line-height:1.2; margin-bottom:12px; }
-  .s1 .subtitle { font-size:1rem; color:#94A3B8; margin-bottom:32px; }
-  .roles { display:flex; gap:10px; flex-wrap:wrap; }
-  .role-badge { padding:6px 16px; border-radius:20px; font-size:0.85rem;
-    font-weight:600; color:#fff; backdrop-filter:blur(8px); }
-
-  /* Slide 2 — Contexte */
-  .s2 { background:var(--light); }
-  .slide-title { font-size:clamp(1.4rem,4vw,2rem); font-weight:800; color:var(--dark); margin-bottom:4px; }
-  .slide-subtitle { font-size:0.95rem; color:var(--mid); font-style:italic; margin-bottom:28px; }
-  .problems-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .problem-card { background:#fff; border-radius:14px; padding:20px;
-    box-shadow:0 2px 16px rgba(0,0,0,0.07); display:flex; gap:14px; align-items:flex-start; }
-  .problem-icon { font-size:1.8rem; flex-shrink:0; }
-  .problem-fr { font-size:0.95rem; font-weight:700; color:var(--dark); margin-bottom:3px; }
-  .problem-en { font-size:0.82rem; color:var(--mid); font-style:italic; }
-
-  /* Slide 3 — Solution */
-  .s3 { background:linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%); }
-  .solution-box { background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.3);
-    border-radius:14px; padding:18px 24px; margin-bottom:24px; text-align:center;
-    font-size:1rem; color:#fff; line-height:1.7; }
-  .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-  .feature-card { border-radius:14px; padding:16px; text-align:center;
-    border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(8px); }
-  .feature-icon { font-size:1.8rem; margin-bottom:8px; }
-  .feature-name { font-size:0.88rem; font-weight:700; color:#fff; margin-bottom:4px; }
-  .feature-en { font-size:0.75rem; color:#94A3B8; font-style:italic; }
-
-  /* Slide 4 — Rôles */
-  .s4 { background:var(--white); }
-  .profiles-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .profile-card { border-radius:14px; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.07); }
-  .profile-header { padding:10px 16px; font-weight:700; color:#fff; font-size:0.95rem; }
-  .profile-body { padding:14px 16px; }
-  .profile-body li { font-size:0.85rem; color:var(--dark); margin-bottom:5px;
-    list-style:none; display:flex; align-items:center; gap:6px; }
-  .profile-body li::before { content:"›"; color:var(--mid); font-weight:700; }
-
-  /* Slide 5 — Tech */
-  .s5 { background:linear-gradient(135deg, var(--navy) 0%, #0f3460 100%); }
-  .tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .tech-card { background:rgba(255,255,255,0.06); border-radius:14px; padding:20px;
-    text-align:center; border:1px solid rgba(255,255,255,0.1); transition:transform 0.2s; }
-  .tech-card:hover { transform:translateY(-4px); }
-  .tech-icon { font-size:2rem; margin-bottom:10px; }
-  .tech-name { font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:4px; }
-  .tech-desc { font-size:0.8rem; color:#94A3B8; line-height:1.5; }
-
-  /* Slide 6 — Screens */
-  .s6 { background:var(--light); }
-  .screens-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .screen-card { border-radius:14px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1);
-    cursor:pointer; transition:transform 0.2s; }
-  .screen-card:hover { transform:translateY(-4px); }
-  .screen-header { padding:10px; text-align:center; font-weight:700; color:#fff; font-size:0.9rem; }
-  .screen-body { background:#fff; padding:20px; text-align:center; font-size:2.2rem; }
-  .screen-label { font-size:0.8rem; color:var(--mid); font-style:italic; padding:8px; background:#fff; text-align:center; }
-
-  /* Slide 7 — CTA */
-  .s7 { background:linear-gradient(135deg, var(--navy) 0%, #1a2a4a 100%); }
-  .cta-link { background:var(--blue); border-radius:14px; padding:16px 32px;
-    text-align:center; margin:20px 0; font-size:1.2rem; font-weight:800; color:#fff;
-    letter-spacing:0.02em; box-shadow:0 8px 24px rgba(37,99,235,0.35);
-    cursor:pointer; transition:transform 0.2s; text-decoration:none; display:block; }
-  .cta-link:hover { transform:scale(1.02); }
-  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:20px; }
-  .step { text-align:center; }
-  .step-num { width:36px; height:36px; border-radius:50%; background:var(--aqua);
-    display:flex; align-items:center; justify-content:center; font-weight:800;
-    color:#fff; font-size:1rem; margin:0 auto 8px; }
-  .step-label { font-size:0.82rem; color:#CBD5E1; line-height:1.5; }
-
-  /* Slide 8 — Merci */
-  .s8 { background:linear-gradient(135deg, var(--navy) 0%, #0f2034 100%); }
-  .thanks-logo { width:90px; height:90px; border-radius:20px; background:var(--blue);
-    display:flex; align-items:center; justify-content:center;
-    font-size:3rem; font-weight:900; color:#fff; margin:0 auto 20px; }
-  .thanks-title { font-size:2.5rem; font-weight:900; color:#fff; text-align:center; margin-bottom:8px; }
-  .thanks-sub { font-size:1.3rem; color:#67E8F9; text-align:center; font-style:italic; margin-bottom:20px; }
-  .thanks-msg { font-size:1rem; color:#94A3B8; text-align:center; margin-bottom:24px; }
-  .thanks-link { background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.4);
-    border-radius:12px; padding:12px 28px; color:#fff; font-size:1rem;
-    text-align:center; margin:0 auto; max-width:400px; cursor:pointer; }
-
-  /* Sidebar de navigation slides */
+  /* ── Sidebar dots (desktop only) ── */
   #sidebar { position:fixed; left:16px; top:50%; transform:translateY(-50%);
-    display:flex; flex-direction:column; gap:6px; z-index:100; }
-  .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2);
-    cursor:pointer; transition:all 0.2s; }
+    display:flex; flex-direction:column; gap:6px; z-index:200; }
+  .dot { width:8px; height:8px; border-radius:50%;
+    background:rgba(255,255,255,0.25); cursor:pointer;
+    transition:all 0.2s; }
   .dot.active { background:#fff; width:10px; height:10px; }
 
-  /* Responsive */
-  @media (max-width:600px) {
-    .problems-grid, .profiles-grid, .screens-grid, .tech-grid { grid-template-columns:1fr; }
-    .features-grid { grid-template-columns:1fr 1fr; }
-    .steps { grid-template-columns:1fr 1fr; }
-    .roles { justify-content:center; }
+  /* ── Bottom nav ── */
+  #nav {
+    position:fixed; bottom:0; left:0; right:0; height:var(--nav-h);
+    display:flex; align-items:center; justify-content:center;
+    gap:12px; z-index:200;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-bottom:env(safe-area-inset-bottom);
   }
+  .nav-btn {
+    background:rgba(255,255,255,0.12); border:none; color:#fff;
+    width:44px; height:44px; border-radius:50%; cursor:pointer;
+    font-size:1.1rem; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .nav-btn:hover, .nav-btn:active { background:var(--blue); transform:scale(1.08); }
+  #counter { color:rgba(255,255,255,0.55); font-size:0.8rem;
+    min-width:44px; text-align:center; }
 
-  .accent-bar { width:50px; height:4px; border-radius:2px; background:var(--blue); margin-bottom:16px; }
-  .footer { position:fixed; bottom:8px; right:16px; font-size:0.7rem; color:rgba(255,255,255,0.2); }
+  /* Mobile dots row inside nav */
+  #mob-dots { display:none; gap:6px; align-items:center; }
+  .mdot { width:7px; height:7px; border-radius:50%;
+    background:rgba(255,255,255,0.25); cursor:pointer;
+    transition:all 0.2s; flex-shrink:0; }
+  .mdot.active { background:#fff; width:9px; height:9px; }
+
+  /* ── Slide 1 — Titre ── */
+  .s1 { background:linear-gradient(150deg, var(--navy) 0%, #1a3a6e 100%); }
+  .logo-box { width:60px; height:60px; border-radius:14px;
+    background:var(--blue); display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; font-weight:900; color:#fff; margin-bottom:8px; }
+  .app-name { font-size:1.4rem; font-weight:800; color:#fff; margin-bottom:2px; }
+  .app-name span { color:#67E8F9; }
+  .tagline { font-size:0.82rem; color:#94A3B8; font-style:italic; margin-bottom:20px; }
+  .s1 h1 { font-size:clamp(1.5rem,5vw,2.6rem); font-weight:900; color:#fff;
+    line-height:1.25; margin-bottom:8px; }
+  .s1 .subtitle { font-size:0.9rem; color:#94A3B8; margin-bottom:20px; }
+  .roles { display:flex; gap:8px; flex-wrap:wrap; }
+  .role-badge { padding:5px 13px; border-radius:20px; font-size:0.8rem;
+    font-weight:600; color:#fff; }
+
+  /* ── Slide 2 — Contexte ── */
+  .s2 { background:var(--light); }
+  .slide-title { font-size:clamp(1.25rem,4vw,1.9rem); font-weight:800;
+    color:var(--dark); margin-bottom:3px; }
+  .slide-subtitle { font-size:0.88rem; color:var(--mid);
+    font-style:italic; margin-bottom:20px; }
+  .problems-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .problem-card { background:#fff; border-radius:12px; padding:16px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.07);
+    display:flex; gap:12px; align-items:flex-start; }
+  .problem-icon { font-size:1.6rem; flex-shrink:0; }
+  .problem-fr { font-size:0.9rem; font-weight:700; color:var(--dark); margin-bottom:2px; }
+  .problem-en { font-size:0.78rem; color:var(--mid); font-style:italic; }
+
+  /* ── Slide 3 — Solution ── */
+  .s3 { background:linear-gradient(150deg, var(--navy) 0%, #1e3a5f 100%); }
+  .solution-box { background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.3);
+    border-radius:12px; padding:14px 18px; margin-bottom:18px;
+    font-size:0.9rem; color:#fff; line-height:1.65; text-align:center; }
+  .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .feature-card { border-radius:12px; padding:14px 10px; text-align:center;
+    border:1px solid rgba(255,255,255,0.1); }
+  .feature-icon { font-size:1.6rem; margin-bottom:6px; }
+  .feature-name { font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:2px; }
+  .feature-en { font-size:0.7rem; color:#94A3B8; font-style:italic; }
+
+  /* ── Slide 4 — Rôles ── */
+  .s4 { background:var(--white); }
+  .profiles-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .profile-card { border-radius:12px; overflow:hidden;
+    box-shadow:0 2px 12px rgba(0,0,0,0.07); }
+  .profile-header { padding:9px 14px; font-weight:700; color:#fff; font-size:0.88rem; }
+  .profile-body { padding:12px 14px; }
+  .profile-body li { font-size:0.8rem; color:var(--dark); margin-bottom:4px;
+    list-style:none; display:flex; align-items:center; gap:5px; }
+  .profile-body li::before { content:"›"; color:var(--mid); font-weight:700; }
+
+  /* ── Slide 5 — Tech ── */
+  .s5 { background:linear-gradient(150deg, var(--navy) 0%, #0f3460 100%); }
+  .tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .tech-card { background:rgba(255,255,255,0.06); border-radius:12px; padding:16px 10px;
+    text-align:center; border:1px solid rgba(255,255,255,0.1); transition:transform 0.2s; }
+  .tech-card:hover { transform:translateY(-3px); }
+  .tech-icon { font-size:1.8rem; margin-bottom:8px; }
+  .tech-name { font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:3px; }
+  .tech-desc { font-size:0.75rem; color:#94A3B8; line-height:1.5; }
+
+  /* ── Slide 6 — Screens ── */
+  .s6 { background:var(--light); }
+  .screens-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .screen-card { border-radius:12px; overflow:hidden;
+    box-shadow:0 3px 16px rgba(0,0,0,0.1); transition:transform 0.2s; }
+  .screen-card:active { transform:scale(0.97); }
+  .screen-header { padding:9px; text-align:center;
+    font-weight:700; color:#fff; font-size:0.82rem; }
+  .screen-body { background:#fff; padding:18px; text-align:center; font-size:2rem; }
+  .screen-label { font-size:0.72rem; color:var(--mid);
+    font-style:italic; padding:6px; background:#fff; text-align:center; }
+
+  /* ── Slide 7 — CTA ── */
+  .s7 { background:linear-gradient(150deg, var(--navy) 0%, #1a2a4a 100%); }
+  .cta-link { background:var(--blue); border-radius:14px; padding:16px 24px;
+    text-align:center; margin:16px 0; font-size:1.1rem; font-weight:800; color:#fff;
+    box-shadow:0 6px 20px rgba(37,99,235,0.35);
+    text-decoration:none; display:block; transition:transform 0.2s; }
+  .cta-link:active { transform:scale(0.98); }
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px; }
+  .step { text-align:center; }
+  .step-num { width:34px; height:34px; border-radius:50%; background:var(--aqua);
+    display:flex; align-items:center; justify-content:center; font-weight:800;
+    color:#fff; font-size:0.95rem; margin:0 auto 6px; }
+  .step-label { font-size:0.78rem; color:#CBD5E1; line-height:1.5; }
+
+  /* ── Slide 8 — Merci ── */
+  .s8 { background:linear-gradient(150deg, var(--navy) 0%, #0f2034 100%); }
+  .thanks-logo { width:80px; height:80px; border-radius:18px; background:var(--blue);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.5rem; font-weight:900; color:#fff; margin:0 auto 16px; }
+  .thanks-title { font-size:2.2rem; font-weight:900; color:#fff;
+    text-align:center; margin-bottom:6px; }
+  .thanks-sub { font-size:1.15rem; color:#67E8F9;
+    text-align:center; font-style:italic; margin-bottom:16px; }
+  .thanks-msg { font-size:0.95rem; color:#94A3B8;
+    text-align:center; margin-bottom:20px; }
+  .thanks-link { background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.4);
+    border-radius:12px; padding:12px 24px; color:#fff; font-size:0.95rem;
+    text-align:center; margin:0 auto; max-width:380px; }
+
+  .accent-bar { width:44px; height:4px; border-radius:2px;
+    background:var(--blue); margin-bottom:14px; }
+
+  /* ════════════════════════════════════════
+     MOBILE  ≤ 640px
+  ════════════════════════════════════════ */
+  @media (max-width:640px) {
+    :root { --nav-h: 64px; }
+
+    /* Slides scroll on mobile */
+    .slide {
+      justify-content:flex-start;
+      padding-top:16px;
+      padding-bottom:calc(var(--nav-h) + 8px);
+    }
+    .slide-inner { padding:0 0 16px; }
+
+    /* Hide sidebar dots, show mobile dots */
+    #sidebar { display:none; }
+    #mob-dots { display:flex; }
+    #counter  { display:none; }
+
+    /* Nav buttons bigger */
+    .nav-btn { width:48px; height:48px; font-size:1.2rem; }
+
+    /* ─ Slide 1 ─ */
+    .logo-box { width:52px; height:52px; font-size:1.5rem; margin-bottom:6px; }
+    .app-name { font-size:1.2rem; }
+    .tagline  { font-size:0.78rem; margin-bottom:14px; }
+    .s1 h1    { font-size:1.55rem; margin-bottom:8px; }
+    .s1 .subtitle { font-size:0.82rem; margin-bottom:14px; }
+    .role-badge { font-size:0.75rem; padding:4px 11px; }
+
+    /* ─ Slide 2 ─ */
+    .problems-grid { grid-template-columns:1fr; gap:10px; }
+    .problem-card  { padding:13px; }
+    .problem-icon  { font-size:1.4rem; }
+    .problem-fr    { font-size:0.88rem; }
+
+    /* ─ Slide 3 ─ */
+    .solution-box   { font-size:0.82rem; padding:12px 14px; }
+    .features-grid  { grid-template-columns:1fr 1fr; gap:9px; }
+    .feature-icon   { font-size:1.4rem; }
+    .feature-name   { font-size:0.78rem; }
+    .feature-en     { display:none; }
+
+    /* ─ Slide 4 ─ */
+    .profiles-grid { grid-template-columns:1fr; gap:10px; }
+    .profile-body li { font-size:0.78rem; }
+
+    /* ─ Slide 5 ─ */
+    .tech-grid { grid-template-columns:1fr 1fr; gap:10px; }
+    .tech-card { padding:12px 8px; }
+    .tech-icon { font-size:1.5rem; }
+    .tech-name { font-size:0.82rem; }
+    .tech-desc { font-size:0.7rem; }
+
+    /* ─ Slide 6 ─ */
+    .screens-grid { grid-template-columns:1fr 1fr; gap:10px; }
+    .screen-body  { padding:14px; font-size:1.7rem; }
+    .screen-label { font-size:0.68rem; }
+
+    /* ─ Slide 7 ─ */
+    .cta-link   { font-size:0.95rem; padding:14px 18px; }
+    .steps      { grid-template-columns:1fr 1fr; gap:10px; }
+    .step-label { font-size:0.73rem; }
+    .step-num   { width:30px; height:30px; font-size:0.85rem; }
+
+    /* ─ Slide 8 ─ */
+    .thanks-logo  { width:66px; height:66px; font-size:2rem; }
+    .thanks-title { font-size:1.75rem; }
+    .thanks-sub   { font-size:1rem; }
+    .thanks-msg   { font-size:0.85rem; }
+    .thanks-link  { font-size:0.85rem; padding:10px 16px; }
+
+    /* General */
+    .slide-title    { font-size:1.3rem; }
+    .slide-subtitle { font-size:0.82rem; margin-bottom:14px; }
+    .accent-bar     { margin-bottom:10px; }
+  }
 </style>
 </head>
 <body>
 
 <div id="progress"></div>
 
-<!-- Sidebar dots -->
+<!-- Sidebar dots (desktop) -->
 <div id="sidebar">
   <div class="dot active" onclick="goTo(0)"></div>
   <div class="dot" onclick="goTo(1)"></div>
@@ -175,14 +283,14 @@
       <div class="app-name">ARSTM<span>Campus</span></div>
       <div class="tagline">Votre campus. Votre réseau. Votre avenir numérique.</div>
       <h1>Une plateforme numérique<br>pour la communauté ARSTM</h1>
-      <div class="subtitle" style="margin-top:8px;font-style:italic;color:#94A3B8">A digital platform for the ARSTM community</div>
+      <div class="subtitle" style="font-style:italic;color:#94A3B8;margin-bottom:8px">A digital platform for the ARSTM community</div>
       <div class="subtitle">Application web — Étudiants · Enseignants · Alumni · Administration</div>
       <div class="roles">
-        <div class="role-badge" style="background:rgba(37,99,235,0.3)">🎓 Étudiants</div>
-        <div class="role-badge" style="background:rgba(5,150,105,0.3)">📖 Enseignants</div>
-        <div class="role-badge" style="background:rgba(217,119,6,0.3)">🏅 Alumni</div>
-        <div class="role-badge" style="background:rgba(124,58,237,0.3)">🏫 Administration</div>
-        <div class="role-badge" style="background:rgba(8,145,178,0.3)">⚙️ Admin Plateforme</div>
+        <div class="role-badge" style="background:rgba(37,99,235,0.35)">🎓 Étudiants</div>
+        <div class="role-badge" style="background:rgba(5,150,105,0.35)">📖 Enseignants</div>
+        <div class="role-badge" style="background:rgba(217,119,6,0.35)">🏅 Alumni</div>
+        <div class="role-badge" style="background:rgba(124,58,237,0.35)">🏫 Administration</div>
+        <div class="role-badge" style="background:rgba(8,145,178,0.35)">⚙️ Admin</div>
       </div>
     </div>
   </div>
@@ -196,11 +304,11 @@
       <div class="problems-grid">
         <div class="problem-card">
           <div class="problem-icon">📋</div>
-          <div><div class="problem-fr">Communication fragmentée</div><div class="problem-en">Scattered announcements, missing info</div></div>
+          <div><div class="problem-fr">Communication fragmentée</div><div class="problem-en">Scattered announcements</div></div>
         </div>
         <div class="problem-card">
           <div class="problem-icon">🔗</div>
-          <div><div class="problem-fr">Réseau alumni inexploité</div><div class="problem-en">Weak alumni-student connection</div></div>
+          <div><div class="problem-fr">Réseau alumni inexploité</div><div class="problem-en">Weak alumni connection</div></div>
         </div>
         <div class="problem-card">
           <div class="problem-icon">📁</div>
@@ -208,7 +316,7 @@
         </div>
         <div class="problem-card">
           <div class="problem-icon">📅</div>
-          <div><div class="problem-fr">EDT difficile d'accès</div><div class="problem-en">Timetables not available in real time</div></div>
+          <div><div class="problem-fr">EDT difficile d'accès</div><div class="problem-en">Timetables not real-time</div></div>
         </div>
       </div>
     </div>
@@ -220,8 +328,8 @@
       <div class="slide-title" style="color:#fff">La Solution</div>
       <div class="slide-subtitle" style="color:#94A3B8">The Solution</div>
       <div class="solution-box">
-        <strong>ARSTM Campus</strong> — Une application web complète, accessible sur tous les appareils,<br>
-        connectant toute la communauté de l'ARSTM · A complete web app connecting the entire ARSTM community
+        <strong>ARSTM Campus</strong> — Une app web complète, accessible sur tous les appareils,<br>
+        connectant toute la communauté ARSTM
       </div>
       <div class="features-grid">
         <div class="feature-card" style="background:rgba(37,99,235,0.15)">
@@ -242,17 +350,17 @@
         <div class="feature-card" style="background:rgba(124,58,237,0.15)">
           <div class="feature-icon">⚙️</div>
           <div class="feature-name">Admin & Contrôle</div>
-          <div class="feature-en">Admin & Control Panel</div>
+          <div class="feature-en">Admin Panel</div>
         </div>
         <div class="feature-card" style="background:rgba(8,145,178,0.15)">
           <div class="feature-icon">🔔</div>
-          <div class="feature-name">Notifications temps réel</div>
+          <div class="feature-name">Notifs temps réel</div>
           <div class="feature-en">Real-time Notifications</div>
         </div>
         <div class="feature-card" style="background:rgba(220,38,38,0.15)">
           <div class="feature-icon">🔒</div>
-          <div class="feature-name">Sécurisé · Firebase</div>
-          <div class="feature-en">Secured · Firebase Auth</div>
+          <div class="feature-name">Sécurisé Firebase</div>
+          <div class="feature-en">Firebase Auth</div>
         </div>
       </div>
     </div>
@@ -266,29 +374,29 @@
       <div class="slide-subtitle">Features by user profile</div>
       <div class="profiles-grid">
         <div class="profile-card">
-          <div class="profile-header" style="background:var(--blue)">🎓 Étudiant / Student</div>
+          <div class="profile-header" style="background:var(--blue)">🎓 Étudiant</div>
           <div class="profile-body"><ul>
             <li>Forum & posts sociaux</li>
             <li>Emploi du temps temps réel</li>
             <li>Ressources & cours</li>
-            <li>Messagerie privée & groupes</li>
-            <li>Offres d'emploi Alumni</li>
+            <li>Messagerie & groupes</li>
+            <li>Offres emploi Alumni</li>
           </ul></div>
         </div>
         <div class="profile-card">
-          <div class="profile-header" style="background:var(--green)">📖 Enseignant / Teacher</div>
+          <div class="profile-header" style="background:var(--green)">📖 Enseignant</div>
           <div class="profile-body"><ul>
-            <li>Dépôt de cours & ressources</li>
-            <li>Annonces ciblées par promo</li>
-            <li>Messagerie avec étudiants</li>
-            <li>Profil multi-écoles ARSTM</li>
-            <li>Forum de la communauté</li>
+            <li>Dépôt cours & ressources</li>
+            <li>Annonces par promo</li>
+            <li>Messagerie étudiants</li>
+            <li>Profil multi-écoles</li>
+            <li>Forum communauté</li>
           </ul></div>
         </div>
         <div class="profile-card">
           <div class="profile-header" style="background:var(--gold)">🏅 Alumni</div>
           <div class="profile-body"><ul>
-            <li>Publication d'offres emploi</li>
+            <li>Offres d'emploi</li>
             <li>Conseils aux étudiants</li>
             <li>Réseau des anciens</li>
             <li>Messagerie privée</li>
@@ -318,36 +426,36 @@
         <div class="tech-card">
           <div class="tech-icon">⚛️</div>
           <div class="tech-name">React + Vite</div>
-          <div class="tech-desc">Interface utilisateur rapide<br>Fast user interface</div>
+          <div class="tech-desc">UI rapide · Fast UI</div>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🔐</div>
           <div class="tech-name">Firebase Auth</div>
-          <div class="tech-desc">Authentification 5 rôles<br>5-role authentication</div>
+          <div class="tech-desc">5 rôles · 5 roles</div>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🗄️</div>
           <div class="tech-name">Firestore</div>
-          <div class="tech-desc">Base de données temps réel<br>Real-time database</div>
+          <div class="tech-desc">Temps réel · Real-time</div>
         </div>
         <div class="tech-card">
           <div class="tech-icon">📦</div>
           <div class="tech-name">Firebase Storage</div>
-          <div class="tech-desc">Fichiers & médias<br>Files & media</div>
+          <div class="tech-desc">Fichiers & médias</div>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🚀</div>
           <div class="tech-name">Vercel</div>
-          <div class="tech-desc">Déploiement automatique<br>Auto deployment CI/CD</div>
+          <div class="tech-desc">CI/CD automatique</div>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🎨</div>
           <div class="tech-name">Tailwind CSS</div>
-          <div class="tech-desc">Design responsive mobile<br>Mobile-first design</div>
+          <div class="tech-desc">Mobile-first design</div>
         </div>
       </div>
-      <div style="text-align:center;margin-top:16px;font-size:0.85rem;color:#64748B">
-        Déployé sur · Deployed at: <strong style="color:#67E8F9">arstm-campus.vercel.app</strong>
+      <div style="text-align:center;margin-top:14px;font-size:0.82rem;color:#64748B">
+        Déployé sur · <strong style="color:#67E8F9">arstm-campus.vercel.app</strong>
       </div>
     </div>
   </div>
@@ -360,34 +468,34 @@
       <div class="slide-subtitle">App Screenshots Preview</div>
       <div class="screens-grid">
         <div class="screen-card">
-          <div class="screen-header" style="background:var(--navy)">🔐 Connexion / Login</div>
+          <div class="screen-header" style="background:var(--navy)">🔐 Connexion</div>
           <div class="screen-body">🔐</div>
-          <div class="screen-label">Inscription par rôle · Role-based signup</div>
+          <div class="screen-label">Inscription par rôle</div>
         </div>
         <div class="screen-card">
-          <div class="screen-header" style="background:var(--blue)">🏠 Accueil / Home</div>
+          <div class="screen-header" style="background:var(--blue)">🏠 Accueil</div>
           <div class="screen-body">🏠</div>
-          <div class="screen-label">Dashboard dynamique · Dynamic dashboard</div>
+          <div class="screen-label">Dashboard dynamique</div>
         </div>
         <div class="screen-card">
-          <div class="screen-header" style="background:var(--green)">💬 Forum Social</div>
+          <div class="screen-header" style="background:var(--green)">💬 Forum</div>
           <div class="screen-body">💬</div>
-          <div class="screen-label">Posts, réactions, commentaires</div>
+          <div class="screen-label">Posts & réactions</div>
         </div>
         <div class="screen-card">
-          <div class="screen-header" style="background:var(--aqua)">✉️ Messagerie</div>
+          <div class="screen-header" style="background:var(--aqua)">✉️ Chat</div>
           <div class="screen-body">✉️</div>
-          <div class="screen-label">Chat privé style WhatsApp</div>
+          <div class="screen-label">Messagerie privée</div>
         </div>
         <div class="screen-card">
           <div class="screen-header" style="background:var(--gold)">🏅 Alumni</div>
           <div class="screen-body">🏅</div>
-          <div class="screen-label">Offres emploi · Job offers</div>
+          <div class="screen-label">Offres d'emploi</div>
         </div>
         <div class="screen-card">
-          <div class="screen-header" style="background:var(--purple)">⚙️ Admin Panel</div>
+          <div class="screen-header" style="background:var(--purple)">⚙️ Admin</div>
           <div class="screen-body">⚙️</div>
-          <div class="screen-label">Centre de contrôle · Control center</div>
+          <div class="screen-label">Centre de contrôle</div>
         </div>
       </div>
     </div>
@@ -396,21 +504,32 @@
   <!-- SLIDE 7 — CTA -->
   <div class="slide s7">
     <div class="slide-inner" style="text-align:center">
-      <div style="font-size:2.5rem;margin-bottom:12px">🚀</div>
+      <div style="font-size:2.2rem;margin-bottom:10px">🚀</div>
       <div class="slide-title" style="color:#fff;text-align:center">Phase de test officielle</div>
-      <div class="slide-subtitle" style="color:#94A3B8;text-align:center;margin-bottom:16px">Official Testing Phase</div>
-      <div style="font-size:0.95rem;color:#94A3B8;margin-bottom:20px;line-height:1.7">
-        Vous êtes nos premiers utilisateurs — votre feedback façonne l'avenir d'ARSTM Campus !<br>
-        <em>You are our first users — your feedback shapes the future of ARSTM Campus!</em>
+      <div class="slide-subtitle" style="color:#94A3B8;text-align:center">Official Testing Phase</div>
+      <div style="font-size:0.9rem;color:#94A3B8;margin-bottom:16px;line-height:1.7">
+        Vous êtes nos premiers utilisateurs — votre feedback façonne l'avenir d'ARSTM Campus !
       </div>
       <a href="https://arstm-campus.vercel.app" target="_blank" class="cta-link">
         🌐 arstm-campus.vercel.app
       </a>
       <div class="steps">
-        <div class="step"><div class="step-num">1</div><div class="step-label">Créer votre compte<br><em>Create account</em></div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-label">Choisir votre profil<br><em>Choose profile</em></div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-label">Explorer & tester<br><em>Explore & test</em></div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-label">Partager votre avis<br><em>Share feedback</em></div></div>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-label">Créer votre compte</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-label">Choisir votre profil</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-label">Explorer & tester</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-label">Partager votre avis</div>
+        </div>
       </div>
     </div>
   </div>
@@ -426,64 +545,94 @@
         <em>Feedback & Questions Welcome</em>
       </div>
       <div class="thanks-link">
-        🌐 arstm-campus.vercel.app &nbsp;|&nbsp; NexaBridge Solutions
+        🌐 arstm-campus.vercel.app &nbsp;| NexaBridge Solutions
       </div>
-      <div style="margin-top:20px;font-size:0.8rem;color:#475569">
-        Développé par · Developed by <strong style="color:#67E8F9">MrDNEJ</strong> · NexaBridge Solutions · Juin 2026
+      <div style="margin-top:16px;font-size:0.78rem;color:#475569">
+        Développé par <strong style="color:#67E8F9">MrDNEJ</strong> · NexaBridge Solutions · Juin 2026
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- Navigation -->
+<!-- Navigation bar -->
 <div id="nav">
-  <button onclick="prev()">←</button>
+  <button class="nav-btn" onclick="prev()" aria-label="Précédent">←</button>
+  <div id="mob-dots">
+    <div class="mdot active" onclick="goTo(0)"></div>
+    <div class="mdot" onclick="goTo(1)"></div>
+    <div class="mdot" onclick="goTo(2)"></div>
+    <div class="mdot" onclick="goTo(3)"></div>
+    <div class="mdot" onclick="goTo(4)"></div>
+    <div class="mdot" onclick="goTo(5)"></div>
+    <div class="mdot" onclick="goTo(6)"></div>
+    <div class="mdot" onclick="goTo(7)"></div>
+  </div>
   <div id="counter">1 / 8</div>
-  <button onclick="next()">→</button>
-  <button onclick="toggleFullscreen()" title="Plein écran">⛶</button>
+  <button class="nav-btn" onclick="next()" aria-label="Suivant">→</button>
+  <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="Plein écran">⛶</button>
 </div>
-
-<div class="footer">ARSTM Campus · NexaBridge Solutions · 2026</div>
 
 <script>
   let current = 0;
-  const slides = document.querySelectorAll(".slide");
-  const dots   = document.querySelectorAll(".dot");
-  const total  = slides.length;
+  const slides  = document.querySelectorAll(".slide");
+  const dots    = document.querySelectorAll(".dot");
+  const mdots   = document.querySelectorAll(".mdot");
+  const total   = slides.length;
 
   function goTo(n) {
-    slides[current].classList.remove("active");
-    dots[current].classList.remove("active");
-    current = Math.max(0, Math.min(n, total-1));
+    const prev = current;
+    slides[prev].classList.remove("active");
+    slides[prev].classList.add("prev");
+    dots[prev].classList.remove("active");
+    mdots[prev].classList.remove("active");
+
+    current = Math.max(0, Math.min(n, total - 1));
+
+    slides[current].classList.remove("prev");
     slides[current].classList.add("active");
+    slides[current].scrollTop = 0;
+
     dots[current].classList.add("active");
-    document.getElementById("counter").textContent = `${current+1} / ${total}`;
-    document.getElementById("progress").style.width = `${((current+1)/total)*100}%`;
+    mdots[current].classList.add("active");
+
+    document.getElementById("counter").textContent = `${current + 1} / ${total}`;
+    document.getElementById("progress").style.width = `${((current + 1) / total) * 100}%`;
+
+    setTimeout(() => slides[prev].classList.remove("prev"), 500);
   }
 
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
+  function next() { if (current < total - 1) goTo(current + 1); }
+  function prev() { if (current > 0)         goTo(current - 1); }
 
   function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
     else document.exitFullscreen();
+  }
+
+  if ('ontouchstart' in window) {
+    document.getElementById("fsBtn").style.display = "none";
   }
 
   document.addEventListener("keydown", e => {
     if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") { e.preventDefault(); next(); }
-    if (e.key === "ArrowLeft"  || e.key === "ArrowUp")   { e.preventDefault(); prev(); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowUp")                     { e.preventDefault(); prev(); }
     if (e.key === "f" || e.key === "F") toggleFullscreen();
-    if (e.key === "Escape" && document.fullscreenElement) document.exitFullscreen();
   });
 
-  // Touch swipe
-  let startX = 0;
-  document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-  document.addEventListener("touchend",   e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
-  });
+  let touchStartX = 0, touchStartY = 0;
+  document.addEventListener("touchstart", e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener("touchend", e => {
+    const dx = touchStartX - e.changedTouches[0].clientX;
+    const dy = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 45) {
+      dx > 0 ? next() : prev();
+    }
+  }, { passive: true });
 
   goTo(0);
 </script>
